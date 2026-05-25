@@ -3,24 +3,30 @@
 ## Session 1 (2026-05-25)
 
 ### 完成
-- Phase 1: 安装 R3F 依赖，添加 GraphNode3D 类型
-- Phase 2: 知识库扩充到 24 个节点
-- Phase 3: 创建 3D 力导向布局算法
-- Phase 4: 创建 7 个 3D 组件
-- Phase 5: 改造主页（3D 画布 + 覆盖层 + Bento Grid）
-- Phase 6: ErrorBoundary 包裹、移动端适配、测试修复
-- 修复 R3F JSX 类型问题（three-jsx.d.ts）
+- Phase 1-6: 3D 神经网络基础实现（依赖、数据、布局、组件、主页、优化）
+- R3F JSX 类型修复
+
+## Session 2 (2026-05-26)
+
+### 完成
+- 基于 NEURAL_NETWORK_ENHANCEMENT.md 全面优化
+- Step 0: 回退 postprocessing 改动，清理代码
+- Step 1: NeuralNode — meshStandardMaterial + 外层光晕 + connectionCount + lerp 动画
+- Step 2: NeuralConnection — 4 种关系样式（粗细/颜色/虚线）+ highlighted 支持
+- Step 3: NodeTooltip — 难度星级、分类色标、阅读时间、连接数（入度/出度）
+- Step 4: NeuralNetworkScene — 悬停高亮联动（关联线高亮/非关联线变暗）+ autoRotate + Bloom
+- Step 5: NeuralNetworkCanvas — 计算 connectionCounts/relatedCounts 并传递
+- Step 6: ParticleField — 彩色粒子（蓝/紫/白）
 
 ### 验证结果
 - npm run build: ✅ 通过
 - npm run test: ✅ 18/18 通过
 - TypeScript: 仅剩 KnowledgeMap.tsx 预存错误
 
-### 已知问题
-- src/pages/KnowledgeMap.tsx:88 — .slug 不存在于 GraphNode（预存 bug）
-
 ### 待验证（浏览器）
-- [ ] 3D 神经网络渲染效果
-- [ ] 节点悬停提示
-- [ ] 点击节点跳转
-- [ ] 移动端触摸交互
+- [ ] 节点脉冲 + 光晕效果
+- [ ] 悬停：放大 + 光晕增强 + 信息卡片 + 关联线高亮
+- [ ] 4 种连接线样式差异
+- [ ] 入场动画
+- [ ] 相机自动旋转
+- [ ] Bloom 辉光效果

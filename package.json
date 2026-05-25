@@ -19,6 +19,7 @@
     "@fontsource/noto-sans-sc": "^5.2.9",
     "@react-three/drei": "^9.122.0",
     "@react-three/fiber": "^8.18.0",
+    "@react-three/postprocessing": "^2.19.1",
     "fuse.js": "^7.3.0",
     "lucide-react": "^1.16.0",
     "motion": "^12.39.0",

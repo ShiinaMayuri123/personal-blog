@@ -33,7 +33,7 @@ function Home() {
         <ErrorBoundary>
           <Suspense fallback={
             <div style={{
-              width: '100%', height: '70vh', background: '#050505',
+              width: '100%', height: '80vh', background: '#050505',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               color: '#525252', fontSize: '0.85rem',
             }}>

@@ -10,10 +10,10 @@ interface LayoutOptions {
 
 const DEFAULT_OPTIONS: Required<LayoutOptions> = {
   iterations: 200,
-  repulsion: 800,
-  attraction: 0.015,
-  centering: 0.01,
-  damping: 0.9,
+  repulsion: 100,
+  attraction: 0.08,
+  centering: 0.06,
+  damping: 0.8,
 }
 
 export function computeForceLayout3D(
@@ -29,7 +29,7 @@ export function computeForceLayout3D(
   nodes.forEach((node, i) => {
     const phi = Math.acos(-1 + (2 * i) / nodes.length)
     const theta = Math.sqrt(nodes.length * Math.PI) * phi
-    const r = 8 + Math.random() * 4
+    const r = 2 + Math.random() * 2
     positions.set(node.id, [
       r * Math.cos(theta) * Math.sin(phi),
       r * Math.sin(theta) * Math.sin(phi),

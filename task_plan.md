@@ -1,34 +1,55 @@
-# 3D 神经网络主页改造 — 任务计划
+# 3D 神经网络 — 基于 NEURAL_NETWORK_ENHANCEMENT.md 全面优化
 
 ## 目标
-将主页从 2D Bento Grid 改造为 3D 神经网络可视化。每个节点 = 一个知识点，连接 = 知识点关系。
+从 UX 和视觉设计出发，让 3D 神经网络从"展示品"变成"活跃的知识生态系统"。
 
-## Phase 1: 安装依赖 + 扩展类型
-**Status**: complete
+## Step 0: 回退上一轮 postprocessing 改动
+**Status**: pending
+- NeuralNode.tsx: meshPhysicalMaterial → meshStandardMaterial + lerp 动画
+- NeuralConnection.tsx: TubeGeometry → drei Line + 关系类型分样式
+- NeuralNetworkScene.tsx: 调整灯光参数
 
-## Phase 2: 扩充知识库数据
-**Status**: complete
+## Step 1: NeuralNode — 多维度信息编码
+**Status**: pending
+- 核心球 meshStandardMaterial (metalness=0.3, roughness=0.7)
+- 外层光晕球 BackSide + 根据 connectionCount 动态 scale
+- lerp 平滑缩放动画
+- 新增 connectionCount prop
 
-## Phase 3: 创建 3D 布局算法
-**Status**: complete
+## Step 2: NeuralConnection — 关系类型视觉差异
+**Status**: pending
+- 4 种关系不同样式（粗细/颜色/透明度/实线虚线）
+- 新增 hovered/highlighted prop
+- advanced 类型脉冲动画
+- highlighted 时 opacity 翻倍，非高亮时降至 0.1
 
-## Phase 4: 创建 3D 组件
-**Status**: complete
+## Step 3: NodeTooltip — 信息卡片升级
+**Status**: pending
+- 难度星级（⭐/⭐⭐/⭐⭐⭐）
+- 分类色标 + 文字
+- 阅读时间
+- 连接数（入度/出度）
+- 新增 connectionCount/relatedCount props
 
-## Phase 5: 改造主页
-**Status**: complete
+## Step 4: NeuralNetworkScene — 入场动画 + 悬停联动 + 相机
+**Status**: pending
+- 节点入场动画（staggered scale 0→1，300ms 起步）
+- 悬停时关联线 highlighted，非关联线 opacity 降至 0.1
+- OrbitControls autoRotate 初始自动旋转
+- 保留 fog + Bloom
 
-## Phase 6: 优化和完善
-**Status**: complete
-- [x] 6.1 ErrorBoundary 包裹 3D 画布（Home.tsx）
-- [x] 6.2 移动端适配（移动端粒子数 400→150）
-- [x] 6.3 测试修复（mock NeuralNetworkCanvas，18/18 通过）
+## Step 5: NeuralNetworkCanvas — 连接数计算 + 加载文案
+**Status**: pending
+- 遍历 edges 统计每个节点入度出度
+- 传递 connectionCounts 给 Scene
+- 增强加载文案："正在构建知识网络..."
 
-## 已知问题
-- src/pages/KnowledgeMap.tsx:88 — .slug 不存在于 GraphNode（预存 bug）
+## Step 6: ParticleField — 大小分级恢复
+**Status**: pending
+- 恢复 sizes 数组（10% 大/30% 中/60% 小）
+- 保留 vertexColors
 
 ## 验证
-- [x] npm run build 通过
-- [x] npm run test 18/18 通过
-- [ ] 浏览器验证 3D 渲染
-- [ ] 移动端触摸交互
+- [ ] npm run build 通过
+- [ ] npm run test 通过
+- [ ] 浏览器验证全部交互效果
