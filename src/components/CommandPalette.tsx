@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Command, X, FileText, Home } from 'lucide-react';
+import { Search, FileText, Home, BookOpen, Map, Route } from 'lucide-react';
 import { articles } from '../data/articles';
+import { searchEngine } from '../utils/search';
+import { knowledgeBase } from '../data/knowledge';
 
 export function CommandPalette() {
   const [isOpen, setIsOpen] = useState(false);
@@ -24,11 +26,18 @@ export function CommandPalette() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const filteredArticles = articles.filter(
-    (article) =>
-      article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      article.excerpt.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredArticles = searchQuery === ''
+    ? articles
+    : articles.filter(
+        (article) =>
+          article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          article.excerpt.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+
+  const searchResults = searchQuery === '' ? [] : searchEngine.search(searchQuery);
+  const filteredKnowledge = searchQuery === ''
+    ? knowledgeBase.slice(0, 3)
+    : searchResults.map(r => knowledgeBase.find(k => k.id === r.id)).filter(Boolean);
 
   const handleSelect = (path: string) => {
     navigate(path);
@@ -61,7 +70,7 @@ export function CommandPalette() {
                 <Search size={20} color="var(--text-muted)" />
                 <input
                   autoFocus
-                  placeholder="搜索文章、项目或使用命令..."
+                  placeholder="搜索知识库、文章或使用命令..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   style={{
@@ -91,16 +100,32 @@ export function CommandPalette() {
                       <Home size={18} color="var(--text-secondary)" />
                       <span style={{ fontSize: '0.95rem' }}>首页</span>
                     </div>
+                    <div
+                      className="cmd-item"
+                      onClick={() => handleSelect('/map')}
+                      style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', cursor: 'pointer', borderRadius: '8px' }}
+                    >
+                      <Map size={18} color="var(--text-secondary)" />
+                      <span style={{ fontSize: '0.95rem' }}>知识图谱</span>
+                    </div>
+                    <div
+                      className="cmd-item"
+                      onClick={() => handleSelect('/paths')}
+                      style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', cursor: 'pointer', borderRadius: '8px' }}
+                    >
+                      <Route size={18} color="var(--text-secondary)" />
+                      <span style={{ fontSize: '0.95rem' }}>学习路径</span>
+                    </div>
                   </div>
                 )}
                 
                 <div>
                   <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', padding: '8px 12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    {searchQuery === '' ? '近期文章' : '搜索结果'}
+                    {searchQuery === '' ? '近期文章' : '文章'}
                   </div>
                   {filteredArticles.length === 0 ? (
-                    <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)' }}>
-                      没有找到匹配的结果
+                    <div style={{ padding: '12px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                      没有找到匹配的文章
                     </div>
                   ) : (
                     filteredArticles.map(article => (
@@ -119,6 +144,30 @@ export function CommandPalette() {
                     ))
                   )}
                 </div>
+
+                {filteredKnowledge.length > 0 && (
+                  <div style={{ marginTop: '12px' }}>
+                    <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', padding: '8px 12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      {searchQuery === '' ? '知识库' : '知识库'}
+                    </div>
+                    {filteredKnowledge.map(item => item && (
+                      <div
+                        key={item.id}
+                        className="cmd-item"
+                        onClick={() => handleSelect(`/knowledge/${item.slug}`)}
+                        style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', cursor: 'pointer', borderRadius: '8px' }}
+                      >
+                        <BookOpen size={18} color="var(--color-accent)" />
+                        <div style={{ flex: 1, overflow: 'hidden' }}>
+                          <div style={{ fontSize: '0.95rem', fontWeight: 500, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{item.title}</div>
+                          <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+                            {item.difficulty} · {item.readTime}分钟
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </motion.div>
           </div>

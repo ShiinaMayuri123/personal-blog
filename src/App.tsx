@@ -3,6 +3,9 @@ import { AnimatePresence, motion } from 'motion/react'
 import { Home as HomeIcon } from 'lucide-react'
 import Home from './pages/Home'
 import ArticleDetail from './pages/ArticleDetail'
+import KnowledgeDetail from './pages/KnowledgeDetail'
+import KnowledgeMap from './pages/KnowledgeMap'
+import LearningPaths from './pages/LearningPaths'
 import ErrorBoundary from './components/ErrorBoundary'
 import ThemeToggle from './components/ThemeToggle'
 import { CommandPalette } from './components/CommandPalette'
@@ -16,41 +19,28 @@ function App() {
       <CommandPalette />
       <div className="app-shell">
         <AnimatePresence mode="wait">
-          {isHome && (
+          {!isHome && (
             <motion.header
-              key="hero"
+              key="nav-header"
               className="site-hero"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] as const }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] as const }}
+              style={{ paddingBottom: 0 }}
             >
-              <div className="site-hero-inner">
-                <div className="site-hero-top">
+              <div className="site-hero-inner" style={{ paddingBottom: '24px' }}>
+                <div className="site-hero-top" style={{ marginBottom: 0 }}>
                   <Link to="/" className="site-title">个人博客</Link>
                   <nav className="site-nav">
                     <Link to="/" className="nav-link">
                       <HomeIcon size={15} />
                       首页
                     </Link>
+                    <Link to="/map" className="nav-link">图谱</Link>
+                    <Link to="/paths" className="nav-link">路径</Link>
                     <ThemeToggle />
                   </nav>
-                </div>
-                <div className="hero-content">
-                  <motion.h1
-                    initial={{ opacity: 0, y: 40 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.7, delay: 0.15, ease: [0.16, 1, 0.3, 1] as const }}
-                  >
-                    记录、思考、<br /><span>构建更好的东西。</span>
-                  </motion.h1>
-                  <motion.p
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.35, ease: [0.16, 1, 0.3, 1] as const }}
-                  >
-                    一个关于前端开发、架构设计和技术探索的个人空间。
-                  </motion.p>
                 </div>
               </div>
             </motion.header>
@@ -68,6 +58,9 @@ function App() {
             <Routes location={location}>
               <Route path="/" element={<Home />} />
               <Route path="/articles/:slug" element={<ArticleDetail />} />
+              <Route path="/knowledge/:slug" element={<KnowledgeDetail />} />
+              <Route path="/map" element={<KnowledgeMap />} />
+              <Route path="/paths" element={<LearningPaths />} />
             </Routes>
           </motion.div>
         </AnimatePresence>

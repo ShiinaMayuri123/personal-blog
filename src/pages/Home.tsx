@@ -1,15 +1,22 @@
 import { Link } from 'react-router-dom'
 import { motion, useInView } from 'motion/react'
-import { useRef, useState } from 'react'
-import { Calendar, Tag, Code, MessageSquare, Mail } from 'lucide-react'
+import { useRef, useState, lazy, Suspense } from 'react'
+import { Calendar, Code, MessageSquare, Mail, BookOpen, Map, Route } from 'lucide-react'
 import { articles } from '../data/articles'
+import { knowledgeBase, getKnowledgeStats } from '../data/knowledge'
 import { BentoGrid, BentoItem } from '../components/BentoGrid'
 import { SpotlightCard } from '../components/SpotlightCard'
+import ErrorBoundary from '../components/ErrorBoundary'
+
+const NeuralNetworkCanvas = lazy(() =>
+  import('../components/neural-network').then(m => ({ default: m.NeuralNetworkCanvas }))
+)
 
 function Home() {
   const headerRef = useRef(null)
   const headerInView = useInView(headerRef, { once: true })
   const [activeTab, setActiveTab] = useState('All')
+  const stats = getKnowledgeStats()
 
   const tabs = ['All', 'Frontend', 'Architecture', 'Life']
   
@@ -20,7 +27,47 @@ function Home() {
     : articles.filter(a => a.tags.some(tag => tag.toLowerCase().includes(activeTab.toLowerCase())))
 
   return (
-    <main className="content-area">
+    <main>
+      {/* 3D Neural Network Hero */}
+      <section style={{ position: 'relative' }}>
+        <ErrorBoundary>
+          <Suspense fallback={
+            <div style={{
+              width: '100%', height: '70vh', background: '#050505',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: '#525252', fontSize: '0.85rem',
+            }}>
+              加载神经网络...
+            </div>
+          }>
+            <NeuralNetworkCanvas />
+          </Suspense>
+        </ErrorBoundary>
+      </section>
+
+      {/* Overlay: Title & Nav */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.3, ease: [0.16, 1, 0.3, 1] as const }}
+        style={{
+          position: 'absolute', top: '24px', left: 0, right: 0, zIndex: 10,
+          maxWidth: '1100px', margin: '0 auto', padding: '0 64px',
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          pointerEvents: 'none',
+        }}
+      >
+        <span style={{ fontSize: '1rem', fontWeight: 800, color: '#fafafa', letterSpacing: '-0.02em', pointerEvents: 'auto' }}>
+          个人博客
+        </span>
+        <nav style={{ display: 'flex', gap: '8px', pointerEvents: 'auto' }}>
+          <Link to="/" className="nav-link" style={{ color: '#737373' }}>首页</Link>
+          <Link to="/map" className="nav-link" style={{ color: '#737373' }}>图谱</Link>
+          <Link to="/paths" className="nav-link" style={{ color: '#737373' }}>路径</Link>
+        </nav>
+      </motion.div>
+
+      <div className="content-area">
       <motion.div
         ref={headerRef}
         className="section-header"
@@ -104,6 +151,66 @@ function Home() {
           </BentoItem>
         )}
 
+        {/* Knowledge Stats */}
+        <BentoItem colSpan={1} rowSpan={1}>
+          <SpotlightCard className="h-full">
+            <div style={{ padding: '28px', display: 'flex', flexDirection: 'column', gap: '16px', height: '100%' }}>
+              <h3 style={{ fontSize: '1rem', fontWeight: 700 }}>📊 知识库统计</h3>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div>
+                  <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--color-primary)' }}>{stats.totalItems}</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>知识点</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--color-primary)' }}>{stats.totalCategories}</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>分类</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--color-primary)' }}>{stats.avgReadTime}m</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>平均阅读</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--color-primary)' }}>{stats.avgRelations}</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>平均关联</div>
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '8px', marginTop: 'auto' }}>
+                <Link to="/map" style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', color: 'var(--color-primary)', textDecoration: 'none' }}>
+                  <Map size={14} /> 图谱
+                </Link>
+                <Link to="/paths" style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', color: 'var(--color-primary)', textDecoration: 'none' }}>
+                  <Route size={14} /> 路径
+                </Link>
+              </div>
+            </div>
+          </SpotlightCard>
+        </BentoItem>
+
+        {/* Knowledge Items */}
+        {knowledgeBase.slice(0, 2).map((item) => (
+          <BentoItem key={item.id} colSpan={1} rowSpan={1}>
+            <Link to={`/knowledge/${item.slug}`} style={{ textDecoration: 'none', display: 'block', height: '100%' }}>
+              <SpotlightCard className="h-full">
+                <div style={{ padding: '28px', display: 'flex', flexDirection: 'column', height: '100%' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                    <BookOpen size={16} color="var(--color-accent)" />
+                    <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: '12px', background: 'rgba(150,150,150,0.1)', color: 'var(--text-muted)' }}>
+                      {item.difficulty}
+                    </span>
+                  </div>
+                  <h3 style={{ fontSize: '1.15rem', marginBottom: '12px', color: 'var(--text)', flex: 1, fontWeight: 700, lineHeight: 1.4 }}>{item.title}</h3>
+                  <div className="article-meta" style={{ marginTop: 'auto' }}>
+                    <span className="meta-item"><Calendar size={12} />{item.lastUpdated}</span>
+                    {item.tags.slice(0, 2).map(tag => (
+                      <span key={tag} className="tag" style={{ background: 'transparent', border: '1px solid var(--border)' }}>{tag}</span>
+                    ))}
+                  </div>
+                </div>
+              </SpotlightCard>
+            </Link>
+          </BentoItem>
+        ))}
+
         {/* Remaining Articles */}
         {filteredArticles.slice(1).map((article, index) => (
           <BentoItem key={article.id} colSpan={1} rowSpan={1}>
@@ -133,6 +240,7 @@ function Home() {
           </BentoItem>
         )}
       </BentoGrid>
+      </div>
     </main>
   )
 }

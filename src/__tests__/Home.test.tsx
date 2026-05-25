@@ -1,7 +1,11 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
 import Home from '../pages/Home'
+
+vi.mock('../components/neural-network', () => ({
+  NeuralNetworkCanvas: () => <div data-testid="neural-network-canvas" />,
+}))
 
 const renderWithRouter = (component: React.ReactElement) => {
   return render(<BrowserRouter>{component}</BrowserRouter>)
@@ -10,7 +14,7 @@ const renderWithRouter = (component: React.ReactElement) => {
 describe('Home', () => {
   it('renders the page title', () => {
     renderWithRouter(<Home />)
-    expect(screen.getByText('最新文章')).toBeInTheDocument()
+    expect(screen.getByText('探索与发现')).toBeInTheDocument()
   })
 
   it('renders all articles', () => {
@@ -19,10 +23,9 @@ describe('Home', () => {
     expect(screen.getByText('为什么选用前端静态博客作为起点')).toBeInTheDocument()
   })
 
-  it('renders article excerpts', () => {
+  it('renders featured article excerpt', () => {
     renderWithRouter(<Home />)
     expect(screen.getByText(/这是第一篇文章/)).toBeInTheDocument()
-    expect(screen.getByText(/前端静态博客方便快速迭代/)).toBeInTheDocument()
   })
 
   it('renders article dates', () => {
@@ -31,11 +34,14 @@ describe('Home', () => {
     expect(dates.length).toBeGreaterThan(0)
   })
 
-  it('renders article tags', () => {
+  it('renders featured article tags', () => {
     renderWithRouter(<Home />)
     expect(screen.getByText('介绍')).toBeInTheDocument()
     expect(screen.getByText('规划')).toBeInTheDocument()
-    expect(screen.getByText('架构')).toBeInTheDocument()
-    expect(screen.getByText('前端')).toBeInTheDocument()
+  })
+
+  it('renders neural network canvas', () => {
+    renderWithRouter(<Home />)
+    expect(screen.getByTestId('neural-network-canvas')).toBeInTheDocument()
   })
 })
