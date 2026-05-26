@@ -4,6 +4,7 @@ import { ArrowLeft, Clock, Target, CheckCircle2, Circle } from 'lucide-react'
 import { learningPaths } from '../data/learning-paths'
 import { knowledgeMap } from '../data/knowledge'
 import { useLearningProgress } from '../hooks/useLearningProgress'
+import { BackButton } from '../components/BackButton'
 
 function LearningPaths() {
   const navigate = useNavigate()
@@ -23,18 +24,12 @@ function LearningPaths() {
               📚 学习路径
             </Link>
             <nav className="site-nav">
-              <motion.button
-                className="nav-link"
-                onClick={() => navigate(-1)}
-                whileHover={{ x: -4 }}
-              >
-                <ArrowLeft size={15} />
-                返回
-              </motion.button>
+              {/* Back button removed in favor of global BackButton */}
             </nav>
           </div>
         </div>
       </motion.header>
+      <BackButton />
 
       <main className="content-area">
         <motion.div

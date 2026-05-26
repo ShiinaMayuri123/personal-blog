@@ -2,6 +2,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { ArrowLeft, Calendar, Tag } from 'lucide-react'
 import { articles } from '../data/articles'
+import { BackButton } from '../components/BackButton'
 
 function ArticleDetail() {
   const { slug } = useParams()
@@ -48,19 +49,12 @@ function ArticleDetail() {
           <div className="site-hero-top" style={{ marginBottom: 0 }}>
             <Link to="/" className="site-title">个人博客</Link>
             <nav className="site-nav">
-              <motion.button
-                className="nav-link"
-                onClick={() => navigate(-1)}
-                style={{ cursor: 'pointer', background: 'none', border: 'none' }}
-                whileHover={{ x: -4, transition: { duration: 0.2 } }}
-              >
-                <ArrowLeft size={15} />
-                返回
-              </motion.button>
+              {/* Back button replaced by global BackButton */}
             </nav>
           </div>
         </div>
       </header>
+      <BackButton />
 
       <motion.article
         className="article-detail-wrapper"

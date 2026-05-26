@@ -8,10 +8,6 @@ import { BentoGrid, BentoItem } from '../components/BentoGrid'
 import { SpotlightCard } from '../components/SpotlightCard'
 import ErrorBoundary from '../components/ErrorBoundary'
 
-const NeuralNetworkCanvas = lazy(() =>
-  import('../components/neural-network').then(m => ({ default: m.NeuralNetworkCanvas }))
-)
-
 function Home() {
   const headerRef = useRef(null)
   const headerInView = useInView(headerRef, { once: true })
@@ -28,21 +24,42 @@ function Home() {
 
   return (
     <main>
-      {/* 3D Neural Network Hero */}
-      <section style={{ position: 'relative' }}>
-        <ErrorBoundary>
-          <Suspense fallback={
-            <div style={{
-              width: '100%', height: '80vh', background: '#050505',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: '#525252', fontSize: '0.85rem',
-            }}>
-              加载神经网络...
-            </div>
-          }>
-            <NeuralNetworkCanvas />
-          </Suspense>
-        </ErrorBoundary>
+      {/* Static Hero Section */}
+      <section style={{ 
+        position: 'relative', 
+        height: '50vh', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        background: 'linear-gradient(180deg, #0a0a1a 0%, #050510 40%, #0d0520 100%)',
+        overflow: 'hidden'
+      }}>
+        {/* Background Pattern */}
+        <div style={{
+          position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+          backgroundImage: 'radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px)',
+          backgroundSize: '40px 40px',
+          pointerEvents: 'none'
+        }} />
+        
+        <div style={{ textAlign: 'center', zIndex: 1 }}>
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
+            style={{ fontSize: '3.5rem', fontWeight: 900, color: '#fff', marginBottom: '16px', letterSpacing: '-0.02em' }}
+          >
+            探索知识的边界
+          </motion.h1>
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1, ease: 'easeOut' }}
+            style={{ color: '#a3a3a3', fontSize: '1.2rem' }}
+          >
+            技术思考 · 架构设计 · 学习路线
+          </motion.p>
+        </div>
       </section>
 
       {/* Overlay: Title & Nav */}

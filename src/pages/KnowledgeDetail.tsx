@@ -5,6 +5,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { knowledgeMap } from '../data/knowledge'
 import { useKnowledgeGraph } from '../hooks/useKnowledgeGraph'
+import { BackButton } from '../components/BackButton'
 
 function KnowledgeDetail() {
   const { slug } = useParams()
@@ -51,18 +52,12 @@ function KnowledgeDetail() {
               📚 知识库
             </Link>
             <nav className="site-nav">
-              <motion.button
-                className="nav-link"
-                onClick={() => navigate(-1)}
-                whileHover={{ x: -4 }}
-              >
-                <ArrowLeft size={15} />
-                返回
-              </motion.button>
+              {/* Back button replaced by global BackButton */}
             </nav>
           </div>
         </div>
       </motion.header>
+      <BackButton />
 
       <motion.article
         className="knowledge-detail"

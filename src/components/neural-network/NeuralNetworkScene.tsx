@@ -2,6 +2,7 @@ import { useMemo, useState, useCallback, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import { EffectComposer, Bloom } from '@react-three/postprocessing'
+import * as THREE from 'three'
 import { GraphNode3D, GraphEdge, RelationType } from '../../types/knowledge'
 import { NeuralNode } from './NeuralNode'
 import { NeuralConnection } from './NeuralConnection'
@@ -34,13 +35,8 @@ export function NeuralNetworkScene({
   const isMobile = useIsMobile()
   const nodeMap = new Map(nodes.map(n => [n.id, n]))
   const controlsRef = useRef<any>(null)
+  const parallaxGroupRef = useRef<THREE.Group>(null)
   const [userInteracted, setUserInteracted] = useState(false)
-
-  // Entry animation: staggered node appearance
-  const entryStartRef = useRef(0)
-  useFrame(({ clock }) => {
-    if (entryStartRef.current === 0) entryStartRef.current = clock.getElapsedTime()
-  })
 
   // Compute highlighted edges and nodes when hovering
   const highlightedEdgeIndices = useMemo(() => {
@@ -58,43 +54,70 @@ export function NeuralNetworkScene({
     if (!userInteracted) setUserInteracted(true)
   }, [userInteracted])
 
+  // Mouse Parallax Animation
+  useFrame((state) => {
+    if (parallaxGroupRef.current) {
+      // Gentle parallax rotation based on mouse coordinates
+      const targetRotY = state.mouse.x * 0.12
+      const targetRotX = -state.mouse.y * 0.12
+
+      parallaxGroupRef.current.rotation.y = THREE.MathUtils.lerp(
+        parallaxGroupRef.current.rotation.y,
+        targetRotY,
+        0.05
+      )
+      parallaxGroupRef.current.rotation.x = THREE.MathUtils.lerp(
+        parallaxGroupRef.current.rotation.x,
+        targetRotX,
+        0.05
+      )
+    }
+  })
+
   return (
     <>
-      <fogExp2 attach="fog" args={["#080818", 0.02]} />
+      <fogExp2 attach="fog" args={["#060612", 0.022]} />
 
-      <ambientLight intensity={0.15} />
-      <pointLight position={[20, 20, 20]} intensity={1.0} color="#ffffff" />
-      <pointLight position={[-20, -10, -20]} intensity={0.5} color="#6366f1" />
-      <pointLight position={[0, 15, -10]} intensity={0.3} color="#3b82f6" />
+      {/* Advanced High-Contrast Three-Point Lighting for Glass Materials */}
+      <ambientLight intensity={0.25} />
+      {/* Top-front white key light */}
+      <pointLight position={[15, 25, 15]} intensity={1.8} color="#ffffff" />
+      {/* Bottom-left purple fill light */}
+      <pointLight position={[-20, -15, -15]} intensity={1.4} color="#a78bfa" />
+      {/* Top-right cyan back light */}
+      <pointLight position={[20, 15, -10]} intensity={1.2} color="#22d3ee" />
 
-      <ParticleField count={isMobile ? 200 : 600} />
+      {/* Parallax Container wrapping all objects */}
+      <group ref={parallaxGroupRef}>
+        <ParticleField count={isMobile ? 220 : 650} />
 
-      {edges.map((edge, i) => {
-        const source = nodeMap.get(edge.source)
-        const target = nodeMap.get(edge.target)
-        if (!source || !target) return null
-        const isHighlighted = highlightedEdgeIndices.has(i)
-        return (
-          <NeuralConnection
-            key={`edge-${i}`}
-            source={source}
-            target={target}
-            type={edge.type as RelationType}
-            hovered={!!hoveredNode}
-            highlighted={isHighlighted}
+        {edges.map((edge, i) => {
+          const source = nodeMap.get(edge.source)
+          const target = nodeMap.get(edge.target)
+          if (!source || !target) return null
+          const isHighlighted = highlightedEdgeIndices.has(i)
+          return (
+            <NeuralConnection
+              key={`edge-${i}`}
+              source={source}
+              target={target}
+              type={edge.type as RelationType}
+              hovered={!!hoveredNode}
+              highlighted={isHighlighted}
+            />
+          )
+        })}
+
+        {nodes.map(node => (
+          <NeuralNode
+            key={node.id}
+            node={node}
+            onHover={onNodeHover}
+            onClick={onNodeClick}
+            connectionCount={connectionCounts.get(node.id) ?? 0}
           />
-        )
-      })}
-
-      {nodes.map(node => (
-        <NeuralNode
-          key={node.id}
-          node={node}
-          onHover={onNodeHover}
-          onClick={onNodeClick}
-          connectionCount={connectionCounts.get(node.id) ?? 0}
-        />
-      ))}
+        ))}
+      </group>
 
       {hoveredNode && (
         <NodeTooltip
@@ -117,11 +140,12 @@ export function NeuralNetworkScene({
         onStart={handleInteractionStart}
       />
 
+      {/* Optimized Bloom Settings for Neon Glowing Effects */}
       <EffectComposer>
         <Bloom
-          luminanceThreshold={0.2}
-          luminanceSmoothing={0.9}
-          intensity={1.5}
+          luminanceThreshold={0.15}
+          luminanceSmoothing={0.8}
+          intensity={1.8}
           mipmapBlur
         />
       </EffectComposer>

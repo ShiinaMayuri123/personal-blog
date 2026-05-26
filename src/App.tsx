@@ -13,13 +13,14 @@ import { CommandPalette } from './components/CommandPalette'
 function App() {
   const location = useLocation()
   const isHome = location.pathname === '/'
+  const isMap = location.pathname === '/map'
 
   return (
     <ErrorBoundary>
       <CommandPalette />
       <div className="app-shell">
         <AnimatePresence mode="wait">
-          {!isHome && (
+          {(!isHome && !isMap) && (
             <motion.header
               key="nav-header"
               className="site-hero"
@@ -65,10 +66,12 @@ function App() {
           </motion.div>
         </AnimatePresence>
 
-        <footer className="site-footer">
-          <p>© 2026 个人博客</p>
-          <p>React + Vite + TypeScript</p>
-        </footer>
+        {!isMap && (
+          <footer className="site-footer">
+            <p>© 2026 个人博客</p>
+            <p>React + Vite + TypeScript</p>
+          </footer>
+        )}
       </div>
     </ErrorBoundary>
   )
