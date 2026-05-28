@@ -1,15 +1,24 @@
-import { useParams, Link, useNavigate } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { ArrowLeft, Calendar, Tag } from 'lucide-react'
-import { articles } from '../data/articles'
+import { useArticle } from '../hooks/useArticles'
 import { BackButton } from '../components/BackButton'
 
 function ArticleDetail() {
   const { slug } = useParams()
-  const navigate = useNavigate()
-  const article = articles.find((item) => item.slug === slug)
+  const { article, loading, error } = useArticle(slug || '')
 
-  if (!article) {
+  if (loading) {
+    return (
+      <main className="content-area">
+        <div style={{ padding: '64px', textAlign: 'center', color: 'var(--text-muted)' }}>
+          加载中...
+        </div>
+      </main>
+    )
+  }
+
+  if (error || !article) {
     return (
       <main className="content-area">
         <section className="not-found">

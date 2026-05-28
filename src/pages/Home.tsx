@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom'
 import { motion, useInView } from 'motion/react'
-import { useRef, useState, lazy, Suspense } from 'react'
+import { useRef, useState } from 'react'
 import { Calendar, Code, MessageSquare, Mail, BookOpen, Map, Route } from 'lucide-react'
-import { articles } from '../data/articles'
-import { knowledgeBase, getKnowledgeStats } from '../data/knowledge'
+import { useArticles } from '../hooks/useArticles'
+import { useKnowledge, useKnowledgeStats } from '../hooks/useKnowledge'
 import { BentoGrid, BentoItem } from '../components/BentoGrid'
 import { SpotlightCard } from '../components/SpotlightCard'
 import ErrorBoundary from '../components/ErrorBoundary'
@@ -12,15 +12,35 @@ function Home() {
   const headerRef = useRef(null)
   const headerInView = useInView(headerRef, { once: true })
   const [activeTab, setActiveTab] = useState('All')
-  const stats = getKnowledgeStats()
+  const { articles, loading: articlesLoading, error: articlesError } = useArticles()
+  const { items: knowledgeBase, loading: knowledgeLoading } = useKnowledge()
+  const { stats, loading: statsLoading } = useKnowledgeStats()
 
   const tabs = ['All', 'Frontend', 'Architecture', 'Life']
-  
-  // A simple hack: if a tag matches the tab name, keep it. 
-  // In reality, you'd match the tags more robustly.
-  const filteredArticles = activeTab === 'All' 
-    ? articles 
+
+  const filteredArticles = activeTab === 'All'
+    ? articles
     : articles.filter(a => a.tags.some(tag => tag.toLowerCase().includes(activeTab.toLowerCase())))
+
+  if (articlesLoading || knowledgeLoading || statsLoading) {
+    return (
+      <main className="content-area">
+        <div style={{ padding: '64px', textAlign: 'center', color: 'var(--text-muted)' }}>
+          加载中...
+        </div>
+      </main>
+    )
+  }
+
+  if (articlesError || !stats) {
+    return (
+      <main className="content-area">
+        <div style={{ padding: '64px', textAlign: 'center', color: 'var(--text-muted)' }}>
+          加载失败: {articlesError || '无法获取统计数据'}
+        </div>
+      </main>
+    )
+  }
 
   return (
     <main>

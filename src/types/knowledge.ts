@@ -2,6 +2,16 @@ export type DifficultyLevel = 'beginner' | 'intermediate' | 'advanced'
 export type CategoryType = 'frontend' | 'architecture' | 'devops' | 'career' | 'tools'
 export type RelationType = 'related' | 'prerequisite' | 'advanced' | 'alternative'
 
+export interface Article {
+  id: string
+  title: string
+  slug: string
+  date: string
+  excerpt: string
+  tags: string[]
+  content: string
+}
+
 export interface KnowledgeItem {
   id: string
   title: string
@@ -51,13 +61,12 @@ export interface KnowledgeGraphData {
 
 export interface LearningPath {
   id: string
-  name: string
+  title: string
+  slug: string
   description: string
   difficulty: DifficultyLevel
   estimatedHours: number
-  itemIds: string[]
-  goals: string[]
-  prerequisites?: string[]
+  knowledgeItemIds: string[]
 }
 
 export interface SearchResult {

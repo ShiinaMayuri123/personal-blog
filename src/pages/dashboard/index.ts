@@ -1,0 +1,6 @@
+export { default as DashboardLayout } from './Layout'
+export { default as DashboardOverview } from './Overview'
+export { default as ArticlesList } from './ArticlesList'
+export { default as ArticleEditor } from './ArticleEditor'
+export { default as KnowledgeList } from './KnowledgeList'
+export { default as KnowledgeEditor } from './KnowledgeEditor'

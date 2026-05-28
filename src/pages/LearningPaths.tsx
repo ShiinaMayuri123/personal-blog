@@ -1,14 +1,42 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { useMemo } from 'react'
+import { Link } from 'react-router-dom'
 import { motion } from 'motion/react'
-import { ArrowLeft, Clock, Target, CheckCircle2, Circle } from 'lucide-react'
-import { learningPaths } from '../data/learning-paths'
-import { knowledgeMap } from '../data/knowledge'
+import { Clock, Target, CheckCircle2, Circle } from 'lucide-react'
+import { useLearningPaths } from '../hooks/useLearningPaths'
+import { useKnowledge } from '../hooks/useKnowledge'
 import { useLearningProgress } from '../hooks/useLearningProgress'
 import { BackButton } from '../components/BackButton'
 
 function LearningPaths() {
-  const navigate = useNavigate()
+  const { paths, loading, error } = useLearningPaths()
+  const { items: knowledgeItems } = useKnowledge()
   const { isComplete, toggleComplete, getPathProgress } = useLearningProgress()
+
+  const knowledgeMap = useMemo(() => {
+    const map = new Map<string, { title: string; slug: string }>()
+    knowledgeItems.forEach(item => map.set(item.id, { title: item.title, slug: item.slug }))
+    return map
+  }, [knowledgeItems])
+
+  if (loading) {
+    return (
+      <main className="content-area">
+        <div style={{ padding: '64px', textAlign: 'center', color: 'var(--text-muted)' }}>
+          加载中...
+        </div>
+      </main>
+    )
+  }
+
+  if (error) {
+    return (
+      <main className="content-area">
+        <div style={{ padding: '64px', textAlign: 'center', color: 'var(--text-muted)' }}>
+          加载失败: {error}
+        </div>
+      </main>
+    )
+  }
 
   return (
     <>
@@ -40,8 +68,8 @@ function LearningPaths() {
           <h2 className="section-header">学习路径</h2>
 
           <div className="learning-paths">
-            {learningPaths.map((path, index) => {
-              const progress = getPathProgress(path.id)
+            {paths.map((path, index) => {
+              const progress = getPathProgress(path.id, path.knowledgeItemIds.length)
               return (
                 <motion.div
                   key={path.id}
@@ -51,7 +79,7 @@ function LearningPaths() {
                   transition={{ delay: index * 0.1 }}
                 >
                   <div className="path-header">
-                    <h3>{path.name}</h3>
+                    <h3>{path.title}</h3>
                     <span className={`difficulty-badge ${path.difficulty}`}>
                       {path.difficulty}
                     </span>
@@ -66,7 +94,7 @@ function LearningPaths() {
                     </span>
                     <span className="meta-item">
                       <Target size={14} />
-                      {path.itemIds.length} 个知识点
+                      {path.knowledgeItemIds.length} 个知识点
                     </span>
                   </div>
 
@@ -81,10 +109,9 @@ function LearningPaths() {
                   </div>
 
                   <div className="path-items">
-                    {path.itemIds.map((itemId, idx) => {
-                      const item = knowledgeMap.get(itemId)
-                      if (!item) return null
+                    {path.knowledgeItemIds.map((itemId, idx) => {
                       const completed = isComplete(path.id, itemId)
+                      const knowledgeItem = knowledgeMap.get(itemId)
                       return (
                         <div
                           key={itemId}
@@ -101,27 +128,17 @@ function LearningPaths() {
                             )}
                           </button>
                           <span className="item-number">{idx + 1}</span>
-                          <Link
-                            to={`/knowledge/${item.slug}`}
-                            className="item-link"
-                          >
-                            {item.title}
-                          </Link>
+                          {knowledgeItem ? (
+                            <Link to={`/knowledge/${knowledgeItem.slug}`} className="item-link">
+                              {knowledgeItem.title}
+                            </Link>
+                          ) : (
+                            <span className="item-link">{itemId}</span>
+                          )}
                         </div>
                       )
                     })}
                   </div>
-
-                  {path.goals.length > 0 && (
-                    <div className="path-goals">
-                      <h4>学习目标</h4>
-                      <ul>
-                        {path.goals.map((goal, idx) => (
-                          <li key={idx}>{goal}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
                 </motion.div>
               )
             })}

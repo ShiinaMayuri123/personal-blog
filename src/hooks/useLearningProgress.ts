@@ -48,12 +48,11 @@ export function useLearningProgress() {
   )
 
   const getPathProgress = useCallback(
-    (pathId: string) => {
+    (pathId: string, totalItems: number) => {
       const pathData = progress[pathId]
-      if (!pathData) return 0
+      if (!pathData || totalItems === 0) return 0
       const completed = Object.values(pathData).filter(Boolean).length
-      const total = Object.keys(pathData).length
-      return total === 0 ? 0 : Math.round((completed / total) * 100)
+      return Math.round((completed / totalItems) * 100)
     },
     [progress]
   )

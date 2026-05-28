@@ -1,20 +1,28 @@
-import { useParams, Link, useNavigate } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { ArrowLeft, Calendar, Tag, Clock, Zap } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { knowledgeMap } from '../data/knowledge'
+import { useKnowledgeItem } from '../hooks/useKnowledge'
 import { useKnowledgeGraph } from '../hooks/useKnowledgeGraph'
 import { BackButton } from '../components/BackButton'
 
 function KnowledgeDetail() {
   const { slug } = useParams()
-  const navigate = useNavigate()
+  const { item, loading, error } = useKnowledgeItem(slug || '')
   const { getRelated, getBacklinks, getPrerequisites, getAdvanced } = useKnowledgeGraph()
 
-  const item = Array.from(knowledgeMap.values()).find(k => k.slug === slug)
+  if (loading) {
+    return (
+      <main className="content-area">
+        <div style={{ padding: '64px', textAlign: 'center', color: 'var(--text-muted)' }}>
+          加载中...
+        </div>
+      </main>
+    )
+  }
 
-  if (!item) {
+  if (error || !item) {
     return (
       <main className="content-area">
         <motion.div

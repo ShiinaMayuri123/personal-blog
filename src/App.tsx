@@ -9,12 +9,34 @@ import LearningPaths from './pages/LearningPaths'
 import ErrorBoundary from './components/ErrorBoundary'
 import ThemeToggle from './components/ThemeToggle'
 import { CommandPalette } from './components/CommandPalette'
+import { DashboardLayout, DashboardOverview, ArticlesList, ArticleEditor, KnowledgeList, KnowledgeEditor } from './pages/dashboard'
 
 function App() {
   const location = useLocation()
   const isHome = location.pathname === '/'
   const isMap = location.pathname === '/map'
+  const isDashboard = location.pathname.startsWith('/dashboard')
 
+  // Dashboard routes - separate layout
+  if (isDashboard) {
+    return (
+      <ErrorBoundary>
+        <Routes location={location}>
+          <Route path="/dashboard" element={<DashboardLayout />}>
+            <Route index element={<DashboardOverview />} />
+            <Route path="articles" element={<ArticlesList />} />
+            <Route path="articles/new" element={<ArticleEditor />} />
+            <Route path="articles/:id" element={<ArticleEditor />} />
+            <Route path="knowledge" element={<KnowledgeList />} />
+            <Route path="knowledge/new" element={<KnowledgeEditor />} />
+            <Route path="knowledge/:id" element={<KnowledgeEditor />} />
+          </Route>
+        </Routes>
+      </ErrorBoundary>
+    )
+  }
+
+  // Public routes
   return (
     <ErrorBoundary>
       <CommandPalette />
